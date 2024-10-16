@@ -1,3 +1,9 @@
+
+const hearBtn = document.querySelector("#hear");
+const numInp = document.querySelector("#inpNum");
+const verifyBtn = document.querySelector("#verify");
+const usrLabel = document.querySelector("#usrLabel");
+
 function setSpeech() {
     	return new Promise(
         	function (resolve, reject) {
@@ -18,6 +24,11 @@ function setSpeech() {
 const App = {
 	synth: null,
 	voices: [],
+	key: -1,
+	randInt(min,max)
+	{
+		return (Math.floor(Math.random()*(max-min))+min)
+	},
 	init(){
 		if(!window.speechSynthesis) {
 			alert("Your browser does not support speech synthesis");
@@ -25,28 +36,35 @@ const App = {
 		}
 		
 		this.synth = window.speechSynthesis;
-		this.speak("hello");
+		this.key = this.randInt(1000,3000);
+		
+		hearBtn.onclick = () =>{
+			this.speak(`${this.key}`);
+		}
+		
+		verifyBtn.onclick = () =>{
+			if(parseInt(numInp.value) === this.key)
+			{
+				usrLabel.innerText = "You are human!"
+			}else{
+				usrLabel.innerText = "You are bot!"
+			}
+		}
 	},
 	
 	speak(text){
-		// if(this.synth.speaking){
-		// 	alert("Error already speaking...");
-		// 	return;
-		// }
-		//if(text.trim() === '') return;
-		
+		 if(this.synth.speaking){
+		 	return;
+		 }
+		 
 		const speakText = new SpeechSynthesisUtterance(text);
 		
-		 speakText.onend = (e) => {
-			alert("ended")
-		 }
+		speakText.onerror = (e) => {
+			console.log(e.error);
+		}
 		
-		 speakText.onerror = (e) => {
-		 	alert(e.error);
-		 }
-		//alert(text);
-		//speakText.rate = "1.2"; // btw 1 and 2 (inc)
-		//speakText.pitch = "1.2"; 
+		speakText.rate = 1.2;
+		speakText.pitch = 0.5; 
 		
 		speakText.voice = this.voices[0];
 		this.synth.speak(speakText);
@@ -55,7 +73,9 @@ const App = {
 }
 
 window.onload = () => {
+	
 	setSpeech().then((voices)=>{
+		loader.style.display="none";
 		App.voices = voices;
 		const f = App.init.bind(App);
 		f();
