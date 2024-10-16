@@ -60,7 +60,7 @@ const App = {
 		const speakText = new SpeechSynthesisUtterance(text);
 		
 		speakText.onerror = (e) => {
-			console.log(e.error);
+			alert(e.error);
 		}
 		
 		speakText.rate = 1.2;
